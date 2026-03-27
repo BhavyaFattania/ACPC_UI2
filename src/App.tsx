@@ -363,8 +363,7 @@ const Footer = () => (
   </footer>
 );
 
-const ChatBot = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const ChatBot = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (o: boolean) => void }) => {
   const [messages, setMessages] = useState<Message[]>([
     { 
       id: '1', 
@@ -433,117 +432,109 @@ const ChatBot = () => {
   return (
     <>
       {/* Toggle Button */}
-      <button 
-        onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 w-16 h-16 rounded-full bg-acpc-blue text-white shadow-2xl flex items-center justify-center transition-all hover:scale-110 z-[100] ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
-      >
-        <div className="absolute -top-1 -right-1 bg-acpc-yellow text-acpc-blue text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">1</div>
-        <MessageSquare size={28} />
-      </button>
+      {!isOpen && (
+        <button 
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-acpc-blue text-white shadow-2xl flex items-center justify-center transition-all hover:scale-110 z-[100]"
+        >
+          <div className="absolute -top-1 -right-1 bg-acpc-yellow text-acpc-blue text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">1</div>
+          <MessageSquare size={28} />
+        </button>
+      )}
 
-      {/* Chat Panel */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div 
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 w-full md:w-[400px] h-full bg-white shadow-2xl z-[101] flex flex-col border-l border-gray-200"
+      {/* Chat Panel Content (rendered inside the parent flex container) */}
+      <div className="chat-panel-container flex flex-col h-full w-full">
+        {/* Header */}
+        <div className="chat-header-gradient p-4 text-white flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-3">
+            <div className="bot-avatar-gradient w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-md">🤖</div>
+            <div>
+              <div className="font-bold text-sm font-display">Ask Ally — ACPC Support</div>
+              <div className="text-[10px] flex items-center gap-1 text-green-300">
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Online &middot; Replies instantly
+              </div>
+            </div>
+          </div>
+          <button 
+            onClick={() => setIsOpen(false)}
+            className="p-1.5 hover:bg-white/20 rounded-full transition-colors"
           >
-            {/* Header */}
-            <div className="chat-header-gradient p-4 text-white flex items-center justify-between shadow-lg">
-              <div className="flex items-center gap-3">
-                <div className="bot-avatar-gradient w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-md">🤖</div>
-                <div>
-                  <div className="font-bold text-sm font-display">Ask Ally — ACPC Support</div>
-                  <div className="text-[10px] flex items-center gap-1 text-green-300">
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Online &middot; Replies instantly
-                  </div>
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f0f4fb] chat-messages-scrollbar">
+          {messages.map((msg) => (
+            <div key={msg.id} className={`flex gap-2 max-w-[90%] ${msg.sender === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-1 shadow-sm ${msg.sender === 'bot' ? 'bot-avatar-gradient' : 'bg-acpc-blue text-white'}`}>
+                {msg.sender === 'bot' ? '🤖' : <User size={14} />}
+              </div>
+              <div className="flex flex-col gap-1">
+                <div 
+                  className={`p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.sender === 'bot' ? 'bg-white text-gray-800 rounded-tl-none border border-gray-100' : 'user-bubble-gradient text-white rounded-tr-none'}`}
+                  dangerouslySetInnerHTML={{ __html: msg.text }}
+                />
+                <span className={`text-[10px] text-gray-400 px-1 ${msg.sender === 'user' ? 'text-right' : ''}`}>{msg.time}</span>
+              </div>
+            </div>
+          ))}
+          {isTyping && (
+            <div className="flex gap-2 max-w-[90%]">
+              <div className="w-8 h-8 rounded-full bot-avatar-gradient flex items-center justify-center text-xs flex-shrink-0 mt-1 shadow-sm">🤖</div>
+              <div className="bg-white p-3 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm">
+                <div className="flex gap-1.5 py-1">
+                  <div className="typing-dot"></div>
+                  <div className="typing-dot" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="typing-dot" style={{ animationDelay: '0.4s' }}></div>
                 </div>
               </div>
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="p-1.5 hover:bg-white/20 rounded-full transition-colors"
-              >
-                <X size={20} />
-              </button>
             </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f0f4fb] chat-messages-scrollbar">
-              {messages.map((msg) => (
-                <div key={msg.id} className={`flex gap-2 max-w-[90%] ${msg.sender === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-1 shadow-sm ${msg.sender === 'bot' ? 'bot-avatar-gradient' : 'bg-acpc-blue text-white'}`}>
-                    {msg.sender === 'bot' ? '🤖' : <User size={14} />}
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <div 
-                      className={`p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.sender === 'bot' ? 'bg-white text-gray-800 rounded-tl-none border border-gray-100' : 'user-bubble-gradient text-white rounded-tr-none'}`}
-                      dangerouslySetInnerHTML={{ __html: msg.text }}
-                    />
-                    <span className={`text-[10px] text-gray-400 px-1 ${msg.sender === 'user' ? 'text-right' : ''}`}>{msg.time}</span>
-                  </div>
-                </div>
+        {/* Suggestions */}
+        {messages.length < 5 && (
+          <div className="p-3 bg-[#e4ecf8] border-t border-gray-100">
+            <div className="text-[10px] font-bold text-acpc-blue/60 uppercase tracking-widest mb-2">Frequently Asked</div>
+            <div className="flex flex-col gap-2">
+              {SUGGESTIONS.map((s) => (
+                <button 
+                  key={s.id}
+                  onClick={() => handleSend(s.text)}
+                  className="suggestion-chip"
+                >
+                  {s.text}
+                </button>
               ))}
-              {isTyping && (
-                <div className="flex gap-2 max-w-[90%]">
-                  <div className="w-8 h-8 rounded-full bot-avatar-gradient flex items-center justify-center text-xs flex-shrink-0 mt-1 shadow-sm">🤖</div>
-                  <div className="bg-white p-3 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm">
-                    <div className="flex gap-1.5 py-1">
-                      <div className="typing-dot"></div>
-                      <div className="typing-dot" style={{ animationDelay: '0.2s' }}></div>
-                      <div className="typing-dot" style={{ animationDelay: '0.4s' }}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
             </div>
-
-            {/* Suggestions */}
-            {messages.length < 5 && (
-              <div className="p-3 bg-[#e4ecf8] border-t border-gray-100">
-                <div className="text-[10px] font-bold text-acpc-blue/60 uppercase tracking-widest mb-2">Frequently Asked</div>
-                <div className="flex flex-col gap-2">
-                  {SUGGESTIONS.map((s) => (
-                    <button 
-                      key={s.id}
-                      onClick={() => handleSend(s.text)}
-                      className="suggestion-chip"
-                    >
-                      {s.text}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Input */}
-            <div className="p-3 bg-white border-t border-gray-100 flex items-end gap-2">
-              <textarea 
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend(inputValue);
-                  }
-                }}
-                placeholder="Type your question here..."
-                className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-acpc-blue focus:bg-white transition-all resize-none max-h-32"
-                rows={1}
-              />
-              <button 
-                onClick={() => handleSend(inputValue)}
-                className="w-11 h-11 bg-acpc-blue text-white rounded-xl flex items-center justify-center shadow-md hover:opacity-90 transition-opacity"
-              >
-                <Send size={18} />
-              </button>
-            </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+
+        {/* Input */}
+        <div className="p-3 bg-white border-t border-gray-100 flex items-end gap-2">
+          <textarea 
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend(inputValue);
+              }
+            }}
+            placeholder="Type your question here..."
+            className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-acpc-blue focus:bg-white transition-all resize-none max-h-32"
+            rows={1}
+          />
+          <button 
+            onClick={() => handleSend(inputValue)}
+            className="w-11 h-11 bg-acpc-blue text-white rounded-xl flex items-center justify-center shadow-md hover:opacity-90 transition-opacity"
+          >
+            <Send size={18} />
+          </button>
+        </div>
+      </div>
     </>
   );
 };
@@ -552,58 +543,81 @@ const ChatBot = () => {
 
 export default function App() {
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 400);
+      if (scrollContainerRef.current) {
+        setShowBackToTop(scrollContainerRef.current.scrollTop > 400);
+      }
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
+    };
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-white">
-      <TopBar />
-      <Header />
-      <Navbar />
-      
-      <main className="flex-1">
-        <Hero />
-        <SearchSection />
-        <CircularsSection />
+    <div className="flex h-screen overflow-hidden font-sans text-gray-900 bg-white">
+      {/* Website Panel */}
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 flex flex-col overflow-y-auto transition-all duration-500 ease-in-out custom-scrollbar"
+      >
+        <TopBar />
+        <Header />
+        <Navbar />
         
-        {/* Additional Info Section */}
-        <div className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-              <div className="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="w-16 h-16 bg-acpc-blue/10 text-acpc-blue rounded-full flex items-center justify-center mx-auto mb-6">
-                  <FileText size={32} />
+        <main className="flex-1">
+          <Hero />
+          <SearchSection />
+          <CircularsSection />
+          
+          {/* Additional Info Section */}
+          <div className="py-16 bg-white">
+            <div className="container mx-auto px-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div className="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-md transition-shadow">
+                  <div className="w-16 h-16 bg-acpc-blue/10 text-acpc-blue rounded-full flex items-center justify-center mx-auto mb-6">
+                    <FileText size={32} />
+                  </div>
+                  <h4 className="text-xl font-bold mb-3">Admission Rules</h4>
+                  <p className="text-gray-600 text-sm">Detailed guidelines and eligibility criteria for all professional courses.</p>
                 </div>
-                <h4 className="text-xl font-bold mb-3">Admission Rules</h4>
-                <p className="text-gray-600 text-sm">Detailed guidelines and eligibility criteria for all professional courses.</p>
-              </div>
-              <div className="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="w-16 h-16 bg-acpc-blue/10 text-acpc-blue rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Clock size={32} />
+                <div className="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-md transition-shadow">
+                  <div className="w-16 h-16 bg-acpc-blue/10 text-acpc-blue rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Clock size={32} />
+                  </div>
+                  <h4 className="text-xl font-bold mb-3">Key Dates</h4>
+                  <p className="text-gray-600 text-sm">Stay updated with the latest admission schedules and deadlines.</p>
                 </div>
-                <h4 className="text-xl font-bold mb-3">Key Dates</h4>
-                <p className="text-gray-600 text-sm">Stay updated with the latest admission schedules and deadlines.</p>
-              </div>
-              <div className="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="w-16 h-16 bg-acpc-blue/10 text-acpc-blue rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Phone size={32} />
+                <div className="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-md transition-shadow">
+                  <div className="w-16 h-16 bg-acpc-blue/10 text-acpc-blue rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Phone size={32} />
+                  </div>
+                  <h4 className="text-xl font-bold mb-3">24/7 Support</h4>
+                  <p className="text-gray-600 text-sm">Our helpdesk and AI assistant are here to solve your queries.</p>
                 </div>
-                <h4 className="text-xl font-bold mb-3">24/7 Support</h4>
-                <p className="text-gray-600 text-sm">Our helpdesk and AI assistant are here to solve your queries.</p>
               </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      <Footer />
-      <ChatBot />
+        <Footer />
+      </div>
+
+      {/* Chat Panel */}
+      <div 
+        className={`transition-all duration-500 ease-in-out overflow-hidden border-l border-gray-200 bg-white flex flex-col ${isChatOpen ? 'w-full md:w-[400px]' : 'w-0 border-l-0'}`}
+      >
+        <ChatBot isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
+      </div>
 
       {/* Back to Top */}
       <AnimatePresence>
@@ -612,7 +626,7 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={() => scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
             className="fixed bottom-24 right-6 w-12 h-12 bg-acpc-yellow text-acpc-blue rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50"
           >
             <ArrowUp size={24} />
