@@ -179,7 +179,7 @@ const Navbar = () => {
 const Hero = () => (
   <div className="relative h-[300px] md:h-[450px] overflow-hidden">
     <img 
-      src="https://picsum.photos/seed/acpc/1920/1080" 
+      src="https://raw.githubusercontent.com/Pruthil-2910/ACPC_UI/46e9f3bfdd9b984d82557a58b94bc03d7ceb6fdf/display-011652795026.jpg" 
       alt="ACPC Hero" 
       className="w-full h-full object-cover"
       referrerPolicy="no-referrer"
