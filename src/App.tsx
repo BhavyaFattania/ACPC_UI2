@@ -63,7 +63,7 @@ const SUGGESTIONS = [
 // ─────────────────────────────────────────────────────────────
 // SOURCE CARD
 // ─────────────────────────────────────────────────────────────
-const SourceCard = ({ source, index }: { source: Source; index: number }) => {
+const SourceCard = ({ source, index }: { source: Source; index: number; key?: React.Key }) => {
   const [expanded, setExpanded] = useState(false);
   const hasUrl = source.url && source.url !== 'N/A';
 
@@ -77,7 +77,7 @@ const SourceCard = ({ source, index }: { source: Source; index: number }) => {
           <span className="source-rank">{index + 1}</span>
           <span className="source-filename truncate">{source.file_name}</span>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {source.score !== null && (
             <span className="source-score">{(source.score * 100).toFixed(0)}%</span>
           )}
@@ -121,7 +121,7 @@ const SourceCard = ({ source, index }: { source: Source; index: number }) => {
 // ─────────────────────────────────────────────────────────────
 // MESSAGE BUBBLE
 // ─────────────────────────────────────────────────────────────
-const MessageBubble = ({ msg }: { msg: Message }) => {
+const MessageBubble = ({ msg }: { msg: Message; key?: React.Key }) => {
   const isBot = msg.sender === 'bot';
   const hasSources = isBot && msg.sources && msg.sources.length > 0;
   const [showSources, setShowSources] = useState(false);
@@ -130,7 +130,7 @@ const MessageBubble = ({ msg }: { msg: Message }) => {
     <div className={`flex gap-2.5 ${isBot ? '' : 'flex-row-reverse ml-auto max-w-[88%]'}`}>
       {/* Avatar */}
       <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 mt-1 shadow-sm
+        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 mt-1 shadow-sm
           ${isBot ? 'bot-avatar-gradient' : 'bg-acpc-blue text-white'}`}
       >
         {isBot ? '🏛️' : <User size={14} />}
@@ -155,7 +155,7 @@ const MessageBubble = ({ msg }: { msg: Message }) => {
             </div>
           ) : msg.isError ? (
             <div className="flex items-start gap-2">
-              <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-red-500" />
+              <AlertCircle size={16} className="shrink-0 mt-0.5 text-red-500" />
               <span>{msg.text}</span>
             </div>
           ) : (
@@ -328,8 +328,7 @@ const ChatBot = ({
     } catch (err: any) {
       const errMsg: Message = {
         id: loadingId,
-        text:
-          'I'm currently unable to reach the ACPC knowledge base. Please check your connection or try again in a moment. For urgent queries, contact ACPC directly at +91-79-26566000.',
+        text:" 'I'm currently unable to reach the ACPC knowledge base. Please check your connection or try again in a moment. For urgent queries, contact ACPC directly at +91-79-26566000.",
         sender: 'bot',
         time: now(),
         isError: true,
@@ -406,7 +405,7 @@ const ChatBot = ({
 
       {/* ── Disclaimer banner ── */}
       <div className="disclaimer-banner">
-        <AlertCircle size={12} className="flex-shrink-0 mt-0.5" />
+        <AlertCircle size={12} className="shrink-0 mt-0.5" />
         <span>
           Responses are based on official ACPC documents. Always verify critical
           information on{' '}
@@ -519,7 +518,7 @@ const Header = () => (
   <div className="bg-[#f6f3ee] py-4 border-b border-gray-200">
     <div className="container mx-auto px-4">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <div className="w-20 h-20 bg-acpc-blue rounded-full flex items-center justify-center text-white font-bold text-2xl">
             ACPC
           </div>
@@ -532,7 +531,7 @@ const Header = () => (
             Admission Committee for Professional Courses (ACPC), Gujarat
           </h1>
         </div>
-        <div className="flex-shrink-0 hidden lg:block">
+        <div className="shrink-0 hidden lg:block">
           <div className="w-20 h-20 border-2 border-acpc-blue rounded-lg flex items-center justify-center text-acpc-blue font-bold">
             GTERS
           </div>
@@ -627,7 +626,7 @@ const Navbar = () => {
 };
 
 const Hero = () => (
-  <div className="relative h-[300px] md:h-[450px] overflow-hidden">
+  <div className="relative h-75 md:h-112.5 overflow-hidden">
     <img
       src="https://raw.githubusercontent.com/Pruthil-2910/ACPC_UI/46e9f3bfdd9b984d82557a58b94bc03d7ceb6fdf/display-011652795026.jpg"
       alt="ACPC Hero"
@@ -674,7 +673,7 @@ const CircularsSection = () => {
   const news = [
     'Corrigendum of EoI for Banking Services',
     'Invitation for Expression of Interest (EOI) for banking services',
-    'Admission process Dos and Don'ts',
+    "Admission process Dos and Don'ts",
     'Advertisement for inviting Expression of Interest',
     'Change in Venue for ACPC Awareness Seminar',
   ];
@@ -727,14 +726,14 @@ const Footer = () => (
           <h4 className="text-acpc-yellow font-bold mb-4">Contact Us</h4>
           <div className="space-y-3 text-sm opacity-90">
             <p className="flex gap-2">
-              <MapPin size={18} className="flex-shrink-0" /> Admission Building, Nr. Library,
+              <MapPin size={18} className="shrink-0" /> Admission Building, Nr. Library,
               L. D. College of Engg. Campus, Ahmedabad 380015
             </p>
             <p className="flex gap-2">
-              <Phone size={18} className="flex-shrink-0" /> +91-79-26566000
+              <Phone size={18} className="shrink-0" /> +91-79-26566000
             </p>
             <p className="flex gap-2">
-              <Mail size={18} className="flex-shrink-0" /> acpc@gujarat.gov.in
+              <Mail size={18} className="shrink-0" /> acpc@gujarat.gov.in
             </p>
           </div>
         </div>
@@ -831,7 +830,7 @@ export default function App() {
       {/* Chat panel */}
       <div
         className={`transition-all duration-500 ease-in-out overflow-hidden border-l border-gray-200 bg-white flex flex-col
-          ${isChatOpen ? 'w-full md:w-[420px]' : 'w-0 border-l-0'}`}
+          ${isChatOpen ? 'w-full md:w-105' : 'w-0 border-l-0'}`}
       >
         {isChatOpen && <ChatBot isOpen={isChatOpen} setIsOpen={setIsChatOpen} />}
       </div>
@@ -844,7 +843,7 @@ export default function App() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setIsChatOpen(true)}
-            className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-acpc-blue text-white shadow-2xl flex items-center justify-center hover:scale-110 transition-transform z-[100]"
+            className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-acpc-blue text-white shadow-2xl flex items-center justify-center hover:scale-110 transition-transform z-100"
           >
             <div className="absolute -top-1 -right-1 bg-acpc-yellow text-acpc-blue text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
               AI
@@ -862,7 +861,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             onClick={() => scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
-            className={`fixed bottom-6 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50 w-12 h-12 bg-acpc-yellow text-acpc-blue ${isChatOpen ? 'right-[436px]' : 'right-24'}`}
+            className={`fixed bottom-6 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50 w-12 h-12 bg-acpc-yellow text-acpc-blue ${isChatOpen ? 'right-109' : 'right-24'}`}
           >
             <ArrowUp size={24} />
           </motion.button>
